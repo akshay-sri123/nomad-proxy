@@ -56,6 +56,7 @@ func jobs(r *http.Request) error {
 	}
 
 	b.Job["Name"] = b.Job["ID"]
+	createAlerts(b)
 	if err := newBody(r, &b); err != nil {
 		return err
 	}
