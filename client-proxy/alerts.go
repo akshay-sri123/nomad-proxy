@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/mitchellh/mapstructure"
@@ -55,37 +54,44 @@ func fireCabotAlert(checkName, cabotQuery string, value int) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Basic "+basicAuth("admin", "admin"))
 	client := &http.Client{}
-	alertResponse := checkIfAlertExists(checkName)
-	if alertResponse == "[]" {
-		fmt.Printf("Creating alert for: %s\n", checkName)
-		response, err := client.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		defer response.Body.Close()
-		fmt.Println("Status:", response.StatusCode)
-	}
-}
-
-func checkIfAlertExists(checkName string) string {
-	getURL := *cabotAddr + "/api/prometheus_checks/?name=" + checkName
-	request, err := http.NewRequest("GET", getURL, nil)
-	if err != nil {
-		panic(err)
-	}
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Add("Authorization", "Basic "+basicAuth("admin", "admin"))
-	client := &http.Client{}
-
-	response, err := client.Do(request)
+	// alertResponse := checkIfAlertExists(checkName)
+	// if alertResponse == "[]" {
+	// 	fmt.Printf("Creating alert for: %s\n", checkName)
+	// 	response, err := client.Do(req)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	defer response.Body.Close()
+	// 	fmt.Println("Status:", response.StatusCode)
+	// }
+	fmt.Printf("Creating alert for: %s\n", checkName)
+	response, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
 	defer response.Body.Close()
-	fmt.Println("Status: ", response.StatusCode)
-	body, _ := ioutil.ReadAll(response.Body)
-	return string(body)
+	fmt.Println("Status:", response.StatusCode)
 }
+
+// func checkIfAlertExists(checkName string) string {
+// 	getURL := *cabotAddr + "/api/prometheus_checks/?name=" + checkName
+// 	request, err := http.NewRequest("GET", getURL, nil)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	request.Header.Set("Content-Type", "application/json")
+// 	request.Header.Add("Authorization", "Basic "+basicAuth("admin", "admin"))
+// 	client := &http.Client{}
+
+// 	response, err := client.Do(request)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer response.Body.Close()
+// 	fmt.Println("Status: ", response.StatusCode)
+// 	body, _ := ioutil.ReadAll(response.Body)
+// 	return string(body)
+// }
 
 func constructCabotQuery(checkName, taskGroupName string) string {
 	datacenter := "central_monitoring"
